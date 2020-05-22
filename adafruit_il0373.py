@@ -55,7 +55,7 @@ _START_SEQUENCE = (
     b"\x01\x05\x03\x00\x2b\x2b\x09"  # power setting
     b"\x06\x03\x17\x17\x17"  # booster soft start
     b"\x04\x80\xc8"  # power on and wait 200 ms
-    b"\x00\x01\xcf"  # panel setting
+    b"\x00\x01\xbf"  # panel setting
     b"\x50\x01\x37"  # CDI setting
     b"\x30\x01\x29"  # PLL
     b"\x61\x03\x00\x00\x00"  # Resolution
