@@ -37,7 +37,7 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_IL0373.git"
 _START_SEQUENCE = (
     b"\x01\x05\x03\x00\x2b\x2b\x09"  # power setting
     b"\x06\x03\x17\x17\x17"  # booster soft start
-    b"\x04\x80\xc8"  # power on and wait 200 ms
+    b"\x04\x80\x10"  # power on and wait 200 ms
     b"\x00\x01\x0f"  # panel setting. Further filled in below.
     b"\x50\x01\x37"  # CDI setting
     b"\x30\x01\x29"  # PLL set to 150 Hz
@@ -101,6 +101,62 @@ _GRAYSCALE_START_SEQUENCE = (
     b"\x00\x00\x00\x00\x00\x00"
 )
 
+_QUICK_START_SEQUENCE = (
+    b"\x01\x05\x03\x00\x2b\x2b\x13"  # power setting
+    b"\x06\x03\x17\x17\x17"  # booster soft start
+    b"\x04\x80\x01"  # power on and wait 200 ms
+    b"\x00\x01\x3f"  # panel setting. Further filled in below.
+    b"\x50\x01\x97"  # CDI setting
+    b"\x30\x01\x3C"  # PLL set to 50 Hz (M = 7, N = 4)
+    b"\x61\x03\x00\x00\x00"  # Resolution
+    b"\x82\x81\x12\x01"  # VCM DC and delay 50ms
+    # Common voltage
+    b"\x20\x2a"
+    b"\x40\x0A\x00\x00\x00\x01"
+    b"\x00\x0b\x0b\x00\x00\x01"
+    b"\x00\x05\x01\x00\x00\x01"
+    b"\x00\x07\x07\x00\x00\x01"
+    b"\x00\x00\x00\x00\x00\x00"
+    b"\x00\x00\x00\x00\x00\x00"
+    b"\x00\x00\x00\x00\x00\x00"
+    # White to White
+    b"\x21\x2a"
+    b"\x40\x0A\x00\x00\x00\x01"
+    b"\x90\x0b\x0b\x00\x00\x01"
+    b"\x40\x05\x01\x00\x00\x01"
+    b"\xA0\x07\x07\x00\x00\x01"
+    b"\x00\x00\x00\x00\x00\x00"
+    b"\x00\x00\x00\x00\x00\x00"
+    b"\x00\x00\x00\x00\x00\x00"
+    # Black to White
+    b"\x22\x2a"
+    b"\x40\x0A\x00\x00\x00\x01"
+    b"\x90\x0b\x0b\x00\x00\x01"
+    b"\x40\x05\x01\x00\x00\x01"
+    b"\xA0\x07\x07\x00\x00\x01"
+    b"\x00\x00\x00\x00\x00\x00"
+    b"\x00\x00\x00\x00\x00\x00"
+    b"\x00\x00\x00\x00\x00\x00"
+    # White to Black
+    b"\x23\x2a"
+    b"\x80\x0A\x00\x00\x00\x01"
+    b"\x90\x0b\x0b\x00\x00\x01"
+    b"\x80\x05\x01\x00\x00\x01"
+    b"\x50\x07\x07\x00\x00\x01"
+    b"\x00\x00\x00\x00\x00\x00"
+    b"\x00\x00\x00\x00\x00\x00"
+    b"\x00\x00\x00\x00\x00\x00"
+    # Black to Black
+    b"\x24\x2a"
+    b"\x80\x0A\x00\x00\x00\x01"
+    b"\x90\x0b\x0b\x00\x00\x01"
+    b"\x80\x05\x01\x00\x00\x01"
+    b"\x50\x07\x07\x00\x00\x01"
+    b"\x00\x00\x00\x00\x00\x00"
+    b"\x00\x00\x00\x00\x00\x00"
+    b"\x00\x00\x00\x00\x00\x00"
+)
+
 _STOP_SEQUENCE = (
     b"\x50\x01\x17"  # CDI setting
     b"\x82\x01\x00"  # VCM DC to -0.10 V
@@ -131,8 +187,14 @@ class IL0373(displayio.EPaperDisplay):
     def __init__(self, bus, swap_rams=False, **kwargs):
         if kwargs.get("grayscale", False):
             start_sequence = bytearray(_GRAYSCALE_START_SEQUENCE)
+        elif kwargs.get("quick", False):
+            start_sequence = bytearray(_QUICK_START_SEQUENCE)
         else:
             start_sequence = bytearray(_START_SEQUENCE)
+
+        if "quick" in kwargs:
+            del kwargs["quick"]
+
 
         width = kwargs["width"]
         height = kwargs["height"]
